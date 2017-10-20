@@ -1,6 +1,7 @@
+#include <cassert>
 #include <cstdint>
 
-template <typename T, const int capacity>
+template <typename T, const int32_t capacity>
 class Stack
 {
 public:
@@ -15,28 +16,31 @@ private:
 };
 
 
-const bool      Stack::empty()
+template<typename T, const int32_t capacity>
+const bool      Stack<T, capacity>::empty()
 {
     return top == -1;
 }
 
-template <typename T>
-const T&        Stack::peek()
+template<typename T, const int32_t capacity>
+const T&        Stack<T, capacity>::peek()
 {
-    return empty() ? nullptr : data[top];
+    assert(!empty());
+
+    return data[top];
 }
 
-template <typename T>
-const T&        Stack::pop()
+template<typename T, const int32_t capacity>
+const T&        Stack<T, capacity>::pop()
 {
-    auto data = peek();
+    auto& data = peek();
     top--;
 
     return data;
 }
 
-template <typename T>
-void            Stack::push(const T &element)
+template<typename T, const int32_t capacity>
+void            Stack<T, capacity>::push(const T &element)
 {
     top++;
     data[top] = element;
