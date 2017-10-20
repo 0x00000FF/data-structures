@@ -1,47 +1,79 @@
-#include <cassert>
-#include <cstdint>
 
-template <typename T, const int32_t capacity>
+#pragma once
+#include <stdexcept>
+
+template <typename T, int32_t _capacity>
 class Stack
 {
 public:
-    const bool  empty ();
-    const T&    peek  ();
-    const T&    pop   ();
-    void        push  (const T& element);
+    explicit      Stack   ();
+                  Stack   (Stack&  stack)                 = default;
+                  Stack   (Stack&& stack) noexcept        = default;
+                  ~Stack  () noexcept;
+
+    const bool    empty   () const noexcept;
+    const bool    full    () const noexcept;
+    const T&      peek    () const;
+    const T&&     pop     () noexcept;
+
+    void          push    (const T&& elem);
+
+    //Stack&        operator= (Stack const&)                                    = default;
+    //const bool    operator==(const Stack<T, _capacity>&) noexcept             = default;
 
 private:
-    int32_t     top            =  -1;
-    T           data[capacity];
+    int32_t   top  = -1;
+    T*        data;
 };
 
+template <typename T, int32_t _capacity>
+Stack<T, _capacity>::Stack ()
+{
+    data = new T[_capacity];
+};
 
-template<typename T, const int32_t capacity>
-const bool      Stack<T, capacity>::empty()
+template <typename T, int32_t _capacity>
+Stack<T, _capacity>::~Stack() noexcept
+{
+    delete data;
+};
+
+template <typename T, int32_t _capacity>
+const bool  Stack<T, _capacity>::empty() const noexcept
 {
     return top == -1;
-}
+};
 
-template<typename T, const int32_t capacity>
-const T&        Stack<T, capacity>::peek()
+template <typename T, int32_t _capacity>
+const bool  Stack<T, _capacity>::full() const noexcept
 {
-    assert(!empty());
+    return top == _capacity - 1;
+};
+
+template <typename T, int32_t _capacity>
+const T&    Stack<T, _capacity>::peek()  const
+{
+    if (empty())
+        throw std::runtime_error("stack is empty");
 
     return data[top];
 }
 
-template<typename T, const int32_t capacity>
-const T&        Stack<T, capacity>::pop()
+template <typename T, int32_t _capacity>
+const T&&   Stack<T, _capacity>::pop()   noexcept
 {
-    auto& data = peek();
-    top--;
+    if (empty())
+        throw std::runtime_error("stack is empty");
 
-    return data;
-}
+    return std::move(data[top--]);
+};
 
-template<typename T, const int32_t capacity>
-void            Stack<T, capacity>::push(const T &element)
+template <typename T, int32_t _capacity>
+void        Stack<T, _capacity>::push(const T&& elem)
 {
+    if (full())
+        throw std::runtime_error("stack is full");
+
     top++;
-    data[top] = element;
-}
+    data[top] = std::move(elem);
+};
