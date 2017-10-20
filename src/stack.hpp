@@ -75,5 +75,5 @@ void        Stack<T, _capacity>::push(const T&& elem)
         throw std::runtime_error("stack is full");
 
     top++;
-    data[top] = std::move(elem);
+    data[top] = elem;
 };
