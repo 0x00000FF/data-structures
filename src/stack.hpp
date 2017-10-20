@@ -38,7 +38,7 @@ Stack<T, _capacity>::Stack ()
 template <typename T, int32_t _capacity>
 Stack<T, _capacity>::~Stack() noexcept
 {
-    delete data;
+    delete [] data;
 };
 
 template <typename T, int32_t _capacity>
