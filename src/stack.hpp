@@ -29,7 +29,10 @@ private:
 template <typename T, int32_t _capacity>
 Stack<T, _capacity>::Stack ()
 {
-    data = new T[_capacity];
+    if (_capacity > 0)
+        data = new T[_capacity];
+    else
+        std::runtime_error("invalid capacity");
 };
 
 template <typename T, int32_t _capacity>
