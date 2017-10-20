@@ -23,6 +23,8 @@ public:
 
 private:
     int32_t   top  = -1;
+    
+protected:
     T*        data;
 };
 
