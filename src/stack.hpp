@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <stdexcept>
 
 template <typename T, unsigned _capacity>
@@ -7,8 +8,6 @@ class Stack
                   "reference type data cannot be element of stack");
 
 public:
-
-    explicit
     Stack() noexcept;
     Stack(Stack<T, _capacity> const&)           = default;
     Stack(Stack<T, _capacity>&&)      noexcept  = default;
@@ -25,7 +24,7 @@ public:
 
 private:
     int32_t top  = -1;
-    T*      data = NULL;
+    T*      data = nullptr;
 };
 
 template <typename T, unsigned _capacity>
@@ -33,14 +32,24 @@ Stack<T, _capacity>::Stack() noexcept
 {
     static_assert(_capacity > 0, "invalid capacity value");
 
-    data = new T[_capacity];
+    data = (T*)malloc(_capacity * sizeof(T));
 }
 
 template <typename T, unsigned _capacity>
 Stack<T, _capacity>::~Stack()
 {
     if (data)
-        delete [] data;
+    {
+        if (empty())
+        {
+            for (int32_t i = top; i > -1; --i)
+            {
+                (data + top)->~T();
+            }
+        }
+
+        free(data);
+    }
 }
 
 template <typename T, unsigned _capacity>
@@ -62,11 +71,7 @@ void     Stack<T, _capacity>::push(T const& item)
         throw std::runtime_error("stack is full");
 
     top++;
-
-    if(&data[top])
-        data[top].~T();
-
-    data[top] = item;
+    *(data+top) = item;
 }
 
 template <typename T, unsigned _capacity>
@@ -76,7 +81,7 @@ auto     Stack<T, _capacity>::pop()
         throw std::runtime_error("stack is empty");
 
     auto elem = std::move(data[top]);
-    data[top].~T();
+    (data+top)->~T();
 
     top--;
 
@@ -89,5 +94,5 @@ const auto& Stack<T, _capacity>::peek() const
     if (empty())
         throw std::runtime_error("stack is empty");
 
-    return data[top];
+    return *(data + top);
 }
