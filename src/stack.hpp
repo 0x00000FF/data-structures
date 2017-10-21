@@ -1,97 +1,89 @@
-#pragma once
 #include <stdexcept>
 
-template <typename T, int32_t _capacity>
+template <typename T, unsigned _capacity>
 class Stack
 {
+    static_assert(!std::is_reference<T>::value,
+                  "reference type data cannot be element of stack");
+
 public:
-    explicit         Stack   ();
-                     Stack   (Stack&  stack)                 = default;
-                     Stack   (Stack&& stack) noexcept        = default;
-                     ~Stack  () noexcept;
 
-    const bool       empty   () const noexcept;
-    const bool       full    () const noexcept;
-    const T&         peek    () const;
-    const T&&        pop     () noexcept;
-    const int32_t    size    () const noexcept;
-    const T* const   ptr     () const noexcept;
+    explicit
+    Stack() noexcept;
+    Stack(Stack<T, _capacity> const&)           = default;
+    Stack(Stack<T, _capacity>&&)      noexcept  = default;
+    ~Stack();
 
-    void             push    (const T&& elem);
+    bool        empty()        const noexcept;
+    bool        full()         const noexcept;
 
-    Stack<T, _capacity>&           operator= (Stack<T, _capacity> const&);
-    const bool                     operator==(const Stack<T, _capacity>&);
+    void        push(T const&);
+    auto        pop();
+    const auto& peek() const;
 
 private:
-    int32_t   top  = -1;
-    T*        data;
+    int32_t top  = -1;
+    T*      data = NULL;
 };
 
-template <typename T, int32_t _capacity>
-Stack<T, _capacity>::Stack ()
+template <typename T, unsigned _capacity>
+Stack<T, _capacity>::Stack() noexcept
 {
-    static_assert(std::is_reference<T>::value, "reference type cannot be element of stack");
+    static_assert(_capacity > 0, "invalid capacity value");
 
     data = new T[_capacity];
 }
 
-template <typename T, int32_t _capacity>
-Stack<T, _capacity>::~Stack() noexcept
+template <typename T, unsigned _capacity>
+Stack<T, _capacity>::~Stack()
 {
-    delete [] data;
+    if (data)
+        delete [] data;
 }
 
-template <typename T, int32_t _capacity>
-const bool        Stack<T, _capacity>::empty() const noexcept
+template <typename T, unsigned _capacity>
+bool     Stack<T, _capacity>::empty() const noexcept
 {
     return top == -1;
 }
 
-template <typename T, int32_t _capacity>
-const bool        Stack<T, _capacity>::full() const noexcept
+template <typename T, unsigned _capacity>
+bool     Stack<T, _capacity>::full() const noexcept
 {
     return top == _capacity - 1;
 }
 
-template <typename T, int32_t _capacity>
-const T&          Stack<T, _capacity>::peek()  const
-{
-    if (empty())
-        throw std::runtime_error("stack is empty");
-
-    return data[top];
-}
-
-template <typename T, int32_t _capacity>
-const T&&         Stack<T, _capacity>::pop()   noexcept
-{
-    if (empty())
-        throw std::runtime_error("stack is empty");
-
-    auto ret = std::move(data[top]);
-    data[top--].~T();
-
-    return ret;
-}
-
-template <typename T, int32_t _capacity>
-void              Stack<T, _capacity>::push(const T&& elem)
+template <typename T, unsigned _capacity>
+void     Stack<T, _capacity>::push(T const& item)
 {
     if (full())
-        throw std::runtime_error("stack is full");
+        std::runtime_error("stack is full");
+
+    if(&data[top])
+        data[top].~T();
 
     top++;
-    data[top] = elem;
+    data[top] = item;
 }
 
-template <typename T, int32_t _capacity>
-const int32_t     Stack<T, _capacity>::size() const noexcept
+template <typename T, unsigned _capacity>
+auto     Stack<T, _capacity>::pop()
 {
-    return _capacity;
+    if (empty())
+        std::runtime_error("stack is empty");
+
+    auto elem = std::move(data[top]);
+    data[top].~T();
+    top--;
+
+    return elem;
 }
 
-template <typename T, int32_t _capacity>
-const T* const    Stack<T, _capacity>::ptr() const noexcept
+template <typename T, unsigned _capacity>
+const auto& Stack<T, _capacity>::peek() const
 {
-    return data;
+    if (empty())
+        std::runtime_error("stack is empty");
+
+    return data[top];
 }
