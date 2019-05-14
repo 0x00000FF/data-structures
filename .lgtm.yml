@@ -1,0 +1,19 @@
+path_classifiers:
+  test:
+    - test
+queries:
+  - exclude: cpp/use-of-goto
+extraction:
+  cpp:
+    prepare:
+      packages:
+        - g++-8
+      after_prepare:
+        - mkdir -p $LGTM_WORKSPACE/build
+        - ln -s /usr/bin/g++-8 $LGTM_WORKSPACE/build/g++
+        - ln -s /usr/bin/gcc-8 $LGTM_WORKSPACE/build/gcc
+        - export PATH=$LGTM_WORKSPACE/build:$PATH
+    before_index:
+    index:
+      build_command:
+        - make -j2 -s
