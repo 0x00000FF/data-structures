@@ -1,15 +1,13 @@
 #include "stack.hpp"
 
-template <typename T, unsigned _capacity>
-Stack<T, _capacity>::Stack() noexcept
+templated_tc Stack<T, C>::Stack() noexcept
 {
-    static_assert(_capacity > 0, "invalid capacity value");
+    static_assert(C > 0, "invalid capacity value");
 
-    data = (T*)malloc(_capacity * sizeof(T));
+    data = (T*)malloc(C * sizeof(T));
 }
 
-template <typename T, unsigned _capacity>
-Stack<T, _capacity>::~Stack()
+templated_tc Stack<T, C>::~Stack()
 {
     if (data)
     {
@@ -25,20 +23,17 @@ Stack<T, _capacity>::~Stack()
     }
 }
 
-template <typename T, unsigned _capacity>
-bool     Stack<T, _capacity>::empty() const noexcept
+templated_tc bool     Stack<T, C>::empty() const noexcept
 {
     return top == -1;
 }
 
-template <typename T, unsigned _capacity>
-bool     Stack<T, _capacity>::full() const noexcept
+templated_tc bool     Stack<T, C>::full() const noexcept
 {
-    return top == _capacity - 1;
+    return top == C - 1;
 }
 
-template <typename T, unsigned _capacity>
-void     Stack<T, _capacity>::push(T const& item)
+templated_tc void     Stack<T, C>::push(T const& item)
 {
     if (full())
         throw std::runtime_error("stack is full");
@@ -47,8 +42,7 @@ void     Stack<T, _capacity>::push(T const& item)
     *(data+top) = item;
 }
 
-template <typename T, unsigned _capacity>
-auto     Stack<T, _capacity>::pop()
+templated_tc auto     Stack<T, C>::pop()
 {
     if (empty())
         throw std::runtime_error("stack is empty");
@@ -61,8 +55,7 @@ auto     Stack<T, _capacity>::pop()
     return elem;
 }
 
-template <typename T, unsigned _capacity>
-const auto& Stack<T, _capacity>::peek() const
+templated_tc const auto& Stack<T, C>::peek() const
 {
     if (empty())
         throw std::runtime_error("stack is empty");

@@ -1,6 +1,7 @@
 #pragma once
+#include "def.hpp"
 
-class linked_list
+templated_t class linked_list
 {
 
 };
